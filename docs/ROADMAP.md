@@ -5,13 +5,15 @@ Check items off as you progress.
 
 ---
 
-## Stage 1 — LangChain Fundamentals · `lessons/01_langchain_basics/`
+## Stage 1 — LangChain Fundamentals · `lessons/01_langchain_basics/` ✅ done
 
-- [ ] Chat model (ChatAnthropic): invoke, stream, system/human messages
-- [ ] LCEL: `prompt | model | parser`, what a `Runnable` is
-- [ ] Structured output (Pydantic) — used to extract document metadata
-- [ ] Tool calling: the `@tool` -> `bind_tools` -> run -> result-back loop
+- [x] Chat model (ChatOllama): invoke, stream, system/human messages
+- [x] LCEL: `prompt | model | parser`, what a `Runnable` is
+- [x] Structured output (Pydantic) — used to extract document metadata
+- [x] Tool calling: the `@tool` -> `bind_tools` -> run -> result-back loop
 - **Builds in the app:** `docassistant/config.py` — understand the factories.
+- **Note:** observed that a small local model hallucinates on niche terms (e.g. "LCEL")
+  but answers correctly when given context — the motivation for RAG (stage 3).
 
 ## Stage 2 — Embeddings + Qdrant · `lessons/02_embeddings_qdrant/`
 

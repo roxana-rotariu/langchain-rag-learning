@@ -32,7 +32,7 @@ def _format_context(docs: list[Document]) -> str:
 
 def answer(question: str, k: int | None = None) -> dict:
     """Return {'answer': str, 'sources': list[Document]}."""
-    k = k or settings.top_k
+    k = settings.top_k if k is None else k
     docs = get_retriever(k=k).invoke(question)
     context = _format_context(docs)
 

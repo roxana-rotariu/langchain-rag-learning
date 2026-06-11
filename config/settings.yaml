@@ -9,7 +9,6 @@ provider: local
 # Local backend — Ollama (LLM) + HuggingFace (embeddings), runs on your machine.
 local:
   chat: qwen2.5:7b                       # good at tool calling (stages 4-6)
-  chat_heavy: qwen2.5:7b                 # bump to a larger model if you pull one
   embedding: BAAI/bge-small-en-v1.5      # downloaded on first use
   embedding_dim: 384                     # bge-small produces 384-dim vectors
   ollama_url: http://localhost:11434
@@ -17,7 +16,6 @@ local:
 # Anthropic backend — kept as a paid fallback (needs ANTHROPIC_API_KEY + VOYAGE_API_KEY).
 anthropic:
   chat: claude-sonnet-4-6                # everyday development
-  chat_heavy: claude-opus-4-8            # heavy tasks
   embedding: voyage-3                    # Voyage AI, 1024-dim vectors
   embedding_dim: 1024
 

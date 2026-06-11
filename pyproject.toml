@@ -1,0 +1,14 @@
+# Project tooling config. Lint with:  ruff check .
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "SIM", "UP", "N", "PTH", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# check_setup.py reconfigures stdout to UTF-8 before importing modules that
+# print, so a module-level import after that statement is intentional.
+"check_setup.py" = ["E402"]
+# Lessons add the project root to sys.path before importing docassistant.
+"lessons/**" = ["E402"]

@@ -6,8 +6,8 @@ Features (grow with the lessons):
 - upload PDF/Word/Excel/PPT -> ingest -> index into Qdrant
 - ask questions -> RAG answer with citations
 
-All UI strings come from config/ui.yaml (no hardcoded text). Works once you
-have the API keys set and Qdrant running.
+All UI strings come from config/ui.yaml (no hardcoded text). Works once the
+provider backend (local Ollama by default) and Qdrant are running.
 """
 import tempfile
 from pathlib import Path
@@ -38,8 +38,11 @@ with st.sidebar:
             suffix = Path(uf.name).suffix
             with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
                 tmp.write(uf.getbuffer())
-                tmp_path = tmp.name
-            chunks = load_and_split(tmp_path)
+                tmp_path = Path(tmp.name)
+            try:
+                chunks = load_and_split(tmp_path)
+            finally:
+                tmp_path.unlink(missing_ok=True)  # never leave temp files behind
             # keep the original filename as the source (tmp has a random name)
             for c in chunks:
                 c.metadata["source"] = uf.name

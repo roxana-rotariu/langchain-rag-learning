@@ -12,7 +12,8 @@ from docassistant.config import get_embeddings, settings
 def get_vector_store():
     """Return a QdrantVectorStore connected to the configured collection.
 
-    Creates the collection if it does not exist (Voyage vector size = 1024).
+    Creates the collection if it does not exist, using the active provider's
+    vector size (settings.embedding_dim) and cosine distance.
     """
     from langchain_qdrant import QdrantVectorStore
     from qdrant_client import QdrantClient
@@ -45,5 +46,5 @@ def add_documents(chunks: list[Document]) -> int:
 
 def get_retriever(k: int | None = None, **search_kwargs):
     """Retriever for the top-k relevant chunks."""
-    k = k or settings.top_k
+    k = settings.top_k if k is None else k
     return get_vector_store().as_retriever(search_kwargs={"k": k, **search_kwargs})

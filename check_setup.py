@@ -51,9 +51,10 @@ def _check_ollama() -> bool:
         if settings.chat_model in names or f"{settings.chat_model}:latest" in names:
             print(f"{OK} model '{settings.chat_model}' pulled")
             return True
-        print(f"{FAIL} model '{settings.chat_model}' not pulled  ->  ollama pull {settings.chat_model}")
+        m = settings.chat_model
+        print(f"{FAIL} model '{m}' not pulled  ->  ollama pull {m}")
         return False
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         print(f"{FAIL} Ollama unreachable at {settings.ollama_url}: {e}")
         print("       ->  install from https://ollama.com and start it")
         return False
@@ -79,7 +80,7 @@ def check_qdrant() -> bool:
         QdrantClient(url=settings.qdrant_url).get_collections()
         print(f"{OK} Qdrant reachable at {settings.qdrant_url}")
         return True
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         print(f"{FAIL} Qdrant unreachable at {settings.qdrant_url}: {e}")
         print("       ->  docker compose up -d")
         return False

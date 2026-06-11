@@ -13,10 +13,11 @@ Two backends, selected by `provider` in settings.yaml (or env LLM_PROVIDER):
 """
 from __future__ import annotations
 
+import contextlib
 import os
 import sys
 from dataclasses import dataclass
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
 
 import yaml
@@ -25,17 +26,15 @@ from dotenv import load_dotenv
 # On Windows the console is cp1252 and crashes on non-ASCII prints. Force UTF-8
 # once, here, since config is imported everywhere.
 if sys.platform == "win32":
-    try:
+    with contextlib.suppress(Exception):
         sys.stdout.reconfigure(encoding="utf-8")
-    except Exception:  # noqa: BLE001
-        pass
 
 load_dotenv()
 
 CONFIG_DIR = Path(__file__).resolve().parents[1] / "config"
 
 
-@lru_cache(maxsize=None)
+@cache
 def _load_yaml(name: str) -> dict:
     """Load and cache a YAML file from the config/ directory."""
     path = CONFIG_DIR / name
@@ -65,7 +64,6 @@ def get_ui_text(key: str) -> str:
 class Settings:
     provider: str            # "local" | "anthropic"
     chat_model: str
-    chat_model_heavy: str
     embedding_model: str
     embedding_dim: int
     ollama_url: str          # only meaningful for the local provider
@@ -95,7 +93,6 @@ def _build_settings() -> Settings:
     return Settings(
         provider=provider,
         chat_model=os.getenv("CHAT_MODEL", p["chat"]),
-        chat_model_heavy=os.getenv("CHAT_MODEL_HEAVY", p["chat_heavy"]),
         embedding_model=os.getenv("EMBEDDING_MODEL", p["embedding"]),
         embedding_dim=int(p["embedding_dim"]),
         ollama_url=os.getenv("OLLAMA_URL", p.get("ollama_url", "http://localhost:11434")),

@@ -21,8 +21,8 @@ def calculator(expression: str) -> str:
     if not set(expression) <= allowed:
         return "Error: disallowed characters."
     try:
-        return str(eval(expression))  # noqa: S307 — demo only, input filtered
-    except Exception as e:  # noqa: BLE001
+        return str(eval(expression))
+    except Exception as e:
         return f"Error: {e}"
 
 

@@ -6,7 +6,8 @@ rag_system: |
   Rules:
   - If the answer is not in the context, clearly say you did not find the
     information in the documents.
-  - Cite sources using [n] matching the fragments you rely on.
+  - Cite sources with the fragment's bracketed number exactly as shown, e.g.
+    [1] or [2]. Do not write the literal letter n (never "[n]" or "[n2]").
   - Be concise and answer in the language of the question.
 
 # Human-turn template for the RAG chain. Placeholders: {context}, {question}.

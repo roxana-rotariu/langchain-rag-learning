@@ -24,15 +24,15 @@ Check items off as you progress.
 - **Note:** confirmed semantic search beats keyword search (0.808 similarity with no shared
   words) and metadata filtering restricts the search to a document subset.
 
-## Stage 3 — RAG with citations · `lessons/03_rag/`  ⭐ this is where it gets useful
+## Stage 3 — RAG with citations · `lessons/03_rag/`  ⭐ ✅ done
 
-- [ ] Loaders for PDF / Word / Excel / PPT
-- [ ] Chunking: `RecursiveCharacterTextSplitter`, chunk size & overlap
-- [ ] Pipeline: load -> split -> embed -> store -> retrieve -> answer
-- [ ] Citations: number the fragments, model cites [1][2], show the sources
-- [ ] MMR / metadata filtering at retrieval; (optional) hybrid dense+sparse, reranking
+- [x] Loaders for PDF / Word / Excel / PPT
+- [x] Chunking: `RecursiveCharacterTextSplitter`, chunk size & overlap
+- [x] Pipeline: load -> split -> embed -> store -> retrieve -> answer
+- [x] Citations: number the fragments, model cites [1][2], show the sources
+- [x] Streaming answers + cached retriever in the Streamlit UI
 - **Builds in the app:** `docassistant/ingest.py` + `docassistant/rag.py` + launch `app.py` (Streamlit).
-- **Milestone:** upload a PDF in the UI and get answers with sources. 🎉
+- **Milestone:** ✅ uploaded the handbook in the UI and got streamed, cited answers end-to-end.
 
 ## Stage 4 — LangGraph · `lessons/04_langgraph/`
 

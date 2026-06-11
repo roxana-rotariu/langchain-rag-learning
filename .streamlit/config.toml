@@ -1,0 +1,7 @@
+# Streamlit config.
+[server]
+# Disable the module-path watcher. It noisily scans every transformers
+# image-processing submodule and prints harmless torchvision import errors
+# (this is a text-only app). Trade-off: no auto-reload on code edits — just
+# restart `streamlit run app.py` after changing code.
+fileWatcherType = "none"

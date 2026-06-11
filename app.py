@@ -4,10 +4,13 @@ Run:  streamlit run app.py
 
 Features (grow with the lessons):
 - upload PDF/Word/Excel/PPT -> ingest -> index into Qdrant
-- ask questions -> RAG answer with citations
+- ask questions -> streamed RAG answer with citations
 
 All UI strings come from config/ui.yaml (no hardcoded text). Works once the
 provider backend (local Ollama by default) and Qdrant are running.
+
+Streamlit re-runs this whole script on every interaction, so the heavy
+embedding model is cached with @st.cache_resource and loaded only once.
 """
 import tempfile
 from pathlib import Path
@@ -16,8 +19,19 @@ import streamlit as st
 
 from docassistant.config import get_ui_text
 from docassistant.ingest import SUPPORTED, load_and_split
-from docassistant.rag import answer
-from docassistant.store import add_documents
+from docassistant.rag import answer_stream
+from docassistant.store import add_documents, get_retriever
+
+
+@st.cache_resource(show_spinner=False)
+def cached_retriever():
+    """Build the retriever once (loads the embedding model) and reuse it.
+
+    Qdrant is queried live each call, so newly indexed documents are still
+    visible — only the embedding model load is cached.
+    """
+    return get_retriever()
+
 
 st.set_page_config(
     page_title=get_ui_text("page_title"),
@@ -53,10 +67,10 @@ st.subheader(get_ui_text("ask_subheader"))
 question = st.text_input(get_ui_text("question_label"))
 if st.button(get_ui_text("answer_button"), disabled=not question):
     with st.spinner(get_ui_text("answer_spinner")):
-        result = answer(question)
-    st.markdown(result["answer"])
+        tokens, sources = answer_stream(question, retriever=cached_retriever())
+    st.write_stream(tokens)  # answer appears token-by-token
     with st.expander(get_ui_text("sources_expander")):
-        for i, d in enumerate(result["sources"], start=1):
+        for i, d in enumerate(sources, start=1):
             src = d.metadata.get("source", "?")
             page = d.metadata.get("page")
             loc = f"{src}, p.{page}" if page is not None else src

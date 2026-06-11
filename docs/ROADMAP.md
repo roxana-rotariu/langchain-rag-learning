@@ -15,12 +15,14 @@ Check items off as you progress.
 - **Note:** observed that a small local model hallucinates on niche terms (e.g. "LCEL")
   but answers correctly when given context — the motivation for RAG (stage 3).
 
-## Stage 2 — Embeddings + Qdrant · `lessons/02_embeddings_qdrant/`
+## Stage 2 — Embeddings + Qdrant · `lessons/02_embeddings_qdrant/` ✅ done
 
-- [ ] What embeddings are; cosine similarity
-- [ ] Qdrant: collection, points, payload, distance
-- [ ] Insert + search with `langchain-qdrant`; metadata filtering
+- [x] What embeddings are; cosine similarity
+- [x] Qdrant: collection, points, payload, distance
+- [x] Insert + search with `langchain-qdrant`; metadata filtering
 - **Builds in the app:** `docassistant/store.py` — index + retriever over the `documents` collection.
+- **Note:** confirmed semantic search beats keyword search (0.808 similarity with no shared
+  words) and metadata filtering restricts the search to a document subset.
 
 ## Stage 3 — RAG with citations · `lessons/03_rag/`  ⭐ this is where it gets useful
 

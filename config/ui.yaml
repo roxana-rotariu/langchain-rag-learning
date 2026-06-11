@@ -1,0 +1,16 @@
+# User-facing UI strings for the Streamlit app. Reference via get_ui_text(key).
+
+page_title: AI Document Assistant
+page_icon: "📄"
+header: "📄 AI Document Assistant"
+
+sidebar_header: Documents
+uploader_label: Upload files
+index_button: Index
+index_success: "Indexed {chunks} chunks from {files} file(s)."
+
+ask_subheader: Ask your documents
+question_label: Your question
+answer_button: Answer
+answer_spinner: Searching documents...
+sources_expander: Sources

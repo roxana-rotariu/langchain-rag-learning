@@ -51,12 +51,14 @@ Check items off as you progress.
 - **Builds in the app:** `agents.build_supervisor_graph()` — LLM routes each question
   to a doc agent (RAG) or a math agent (calculator tool).
 
-## Stage 6 — MCP · `lessons/06_mcp/`
+## Stage 6 — MCP · `lessons/06_mcp/` ✅ done
 
-- [ ] Server vs client MCP; tools/resources
-- [ ] Write an MCP server that exposes the document-search tool
-- [ ] `langchain-mcp-adapters` — consume MCP tools in the graph
-- **Builds in the app:** extract retrieval into a reusable MCP server.
+- [x] Server vs client MCP; tools/resources
+- [x] Wrote an MCP server (`docassistant/mcp_server.py`) exposing `search_documents`
+- [x] `langchain-mcp-adapters` — consumed MCP tools in a LangGraph agent
+- **Builds in the app:** retrieval is now a reusable MCP service; an agent uses it over stdio.
+- **Note:** stdio servers must keep stdout clean — model loading is fd-redirected to
+  stderr and warmed once at startup, or it corrupts the JSON-RPC stream.
 
 ---
 

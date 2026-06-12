@@ -34,12 +34,15 @@ Check items off as you progress.
 - **Builds in the app:** `docassistant/ingest.py` + `docassistant/rag.py` + launch `app.py` (Streamlit).
 - **Milestone:** ✅ uploaded the handbook in the UI and got streamed, cited answers end-to-end.
 
-## Stage 4 — LangGraph · `lessons/04_langgraph/`
+## Stage 4 — LangGraph · `lessons/04_langgraph/` ✅ done
 
-- [ ] `StateGraph`: state (TypedDict), nodes, edges, conditional edges, cycles
-- [ ] Checkpointing (memory across turns), human-in-the-loop
-- [ ] Why LangGraph > AgentExecutor (legacy)
-- **Builds in the app:** `docassistant/agents.py` — RAG as a graph with state + decide retrieve/answer.
+- [x] `StateGraph`: state (TypedDict), nodes, edges, conditional edges
+- [x] Checkpointing (memory across turns), human-in-the-loop (interrupt + resume)
+- [x] Why LangGraph > AgentExecutor (legacy)
+- **Builds in the app:** `docassistant/agents.py` — RAG as a graph that routes
+  greetings to a direct answer and real questions through retrieval.
+- **Note:** keyword-based routing is a teaching simplification; real systems route
+  with the LLM or tool calling.
 
 ## Stage 5 — Multi-agent · `lessons/05_multi_agent/`
 

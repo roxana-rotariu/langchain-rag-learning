@@ -44,11 +44,12 @@ Check items off as you progress.
 - **Note:** keyword-based routing is a teaching simplification; real systems route
   with the LLM or tool calling.
 
-## Stage 5 — Multi-agent · `lessons/05_multi_agent/`
+## Stage 5 — Multi-agent · `lessons/05_multi_agent/` ✅ done
 
-- [ ] Supervisor pattern; handoffs; hierarchical
-- [ ] When multi-agent beats a single agent with tools
-- **Builds in the app:** a supervisor that delegates: one searches documents, another summarizes/compares.
+- [x] Supervisor pattern; handoffs (`Command(goto=...)`)
+- [x] When multi-agent beats a single agent with tools (default to one agent + tools)
+- **Builds in the app:** `agents.build_supervisor_graph()` — LLM routes each question
+  to a doc agent (RAG) or a math agent (calculator tool).
 
 ## Stage 6 — MCP · `lessons/06_mcp/`
 

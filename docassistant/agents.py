@@ -1,19 +1,24 @@
-"""Agents — RAG rebuilt as a LangGraph graph (stage 4).
+"""Agents — RAG as a LangGraph graph (stage 4) + multi-agent supervisor (stage 5).
 
 A chain always does the same fixed steps. A graph has explicit STATE and can
 DECIDE what to do next (conditional edges), loop, persist memory, and pause for
-human input. Here we wrap the existing rag/store building blocks in a graph.
+human input. A multi-agent supervisor routes each question to a specialized
+sub-agent (here: documents vs math).
 
 Public interface:
-    build_rag_graph(checkpointer=None) -> compiled graph
-    graph_answer(question, ...)        -> str   (convenience one-shot)
+    build_rag_graph(checkpointer=None)  -> compiled RAG graph
+    graph_answer(question)              -> str
+    build_supervisor_graph()            -> compiled supervisor graph
+    supervisor_answer(question)         -> dict {route, answer}
 
-Later stages (5 multi-agent, 6 MCP) build on this.
+Stage 6 (MCP) builds on this.
 """
 from __future__ import annotations
 
 from typing import TypedDict
 
+from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.tools import tool
 from langgraph.graph import END, START, StateGraph
 
 from docassistant.config import get_chat_model, get_prompt
@@ -89,3 +94,92 @@ def graph_answer(question: str) -> str:
     """One-shot convenience: run the graph and return just the answer text."""
     result = build_rag_graph().invoke({"question": question})
     return result["answer"]
+
+
+# --------------------------------------------------------------------------- #
+# Stage 5 — multi-agent supervisor
+# --------------------------------------------------------------------------- #
+
+
+@tool
+def calculator(expression: str) -> str:
+    """Evaluate a simple arithmetic expression, e.g. '23 * 19 + 4'."""
+    allowed = set("0123456789+-*/(). ")
+    if not set(expression) <= allowed:
+        return "Error: disallowed characters."
+    try:
+        return str(eval(expression))  # demo only — input restricted to the allowlist above
+    except Exception as e:
+        return f"Error: {e}"
+
+
+class SupervisorState(TypedDict):
+    """State for the supervisor graph."""
+    question: str
+    route: str       # "doc" | "math", set by the supervisor
+    answer: str
+
+
+def _supervisor(state: SupervisorState) -> SupervisorState:
+    """Ask the LLM which specialist should handle the question."""
+    instruction = (
+        "Route the user's question to a specialist. Reply with ONE word only:\n"
+        "- 'math' if it is an arithmetic calculation\n"
+        "- 'doc' for anything that should be answered from documents\n"
+        f"Question: {state['question']}"
+    )
+    reply = get_chat_model().invoke(instruction).content.lower()
+    state["route"] = "math" if "math" in reply else "doc"
+    return state
+
+
+def _doc_agent(state: SupervisorState) -> SupervisorState:
+    """Specialist 1: answer from the documents (RAG)."""
+    docs = get_retriever().invoke(state["question"])
+    prompt = get_prompt("rag_system") + f"\n\nContext:\n{_format_context(docs)}"
+    messages = [("system", prompt), ("human", state["question"])]
+    state["answer"] = get_chat_model().invoke(messages).content
+    return state
+
+
+def _math_agent(state: SupervisorState) -> SupervisorState:
+    """Specialist 2: solve the calculation using the calculator tool."""
+    model = get_chat_model().bind_tools([calculator])
+    messages = [HumanMessage(state["question"])]
+    ai = model.invoke(messages)
+    messages.append(ai)
+    for call in ai.tool_calls:
+        result = calculator.invoke(call["args"])
+        messages.append(ToolMessage(content=result, tool_call_id=call["id"]))
+    state["answer"] = model.invoke(messages).content if ai.tool_calls else ai.content
+    return state
+
+
+def _pick_specialist(state: SupervisorState) -> str:
+    """Conditional-edge function: route to the chosen specialist node."""
+    return state["route"]
+
+
+def build_supervisor_graph(checkpointer=None):
+    """Build a supervisor that delegates to a doc agent or a math agent.
+
+    Flow:  START -> supervisor -> (doc_agent | math_agent) -> END
+    """
+    graph = StateGraph(SupervisorState)
+    graph.add_node("supervisor", _supervisor)
+    graph.add_node("doc_agent", _doc_agent)
+    graph.add_node("math_agent", _math_agent)
+
+    graph.add_edge(START, "supervisor")
+    graph.add_conditional_edges("supervisor", _pick_specialist,
+                                {"doc": "doc_agent", "math": "math_agent"})
+    graph.add_edge("doc_agent", END)
+    graph.add_edge("math_agent", END)
+
+    return graph.compile(checkpointer=checkpointer)
+
+
+def supervisor_answer(question: str) -> dict:
+    """One-shot: run the supervisor graph, return {'route': ..., 'answer': ...}."""
+    result = build_supervisor_graph().invoke({"question": question})
+    return {"route": result["route"], "answer": result["answer"]}
